@@ -1,11 +1,11 @@
-#include <Stepper.h>
-#define DEBUG 1
+#include <Stepper.h> 
+#define DEBUG true
 /**
  * GraveYard ver 0.0.1
  * Author: Vesa Kankkunen
  * Ver: 0.0.1
 */
-
+const int ANALOG_GROUND_LIMIT =500;
 struct 
 {
   /* data */
@@ -22,6 +22,8 @@ struct
   bool resetDone =false;
   int buttonVal = 0;
 } Alien;
+
+
 
 Stepper alienStepper(
   Alien.STEPS_TOTAL,
@@ -79,25 +81,31 @@ void alienAlas(){
   #ifdef DEBUG
     debug("alienAlas()");
   #endif
-  alienStepper.step(-1*Alien.STEPS_UPDOWN);//steppien pituus alienin laskuun
+  alienStepper.step(-1 * Alien.STEPS_UPDOWN);//steppien pituus alienin laskuun
 }
 
 void alienYlos(){
+  #ifdef DEBUG
+    debug("alienYlos()");
+  #endif 
   alienStepper.step(Alien.STEPS_UPDOWN); //steppien pituus alienin nostoon (=-laskupituus)
 }
 
 void alienReset(){
   #ifdef DEBUG
     debug("alienReset()");
+    debug("DPIN_IN1_A: "+(String)Alien.DPIN_IN1_A);
+    debug("DPIN_IN1_B: "+(String)Alien.DPIN_IN2_B);
+    debug("Alien.APIN_ALHAALLA_BTN: "+ (String)Alien.APIN_ALHAALLA_BTN);
   #endif
   alienStepper.setSpeed(Alien.SPEED);
-  while (Alien.buttonVal == 0)
+  while (Alien.buttonVal  < ANALOG_GROUND_LIMIT)
   {
     alienStepper.step(-1 * Alien.STEPLEN_IN_RESET);
     Alien.buttonVal = analogRead(Alien.APIN_ALHAALLA_BTN);
     delay(1);
   }
-  while (Alien.buttonVal > 0)
+  while (Alien.buttonVal > ANALOG_GROUND_LIMIT)
   {
     alienStepper.step(Alien.STEPLEN_IN_RESET);
     Alien.buttonVal = analogRead(Alien.APIN_ALHAALLA_BTN);
@@ -131,11 +139,16 @@ void hissiReset(){
 }
 /**Ketju funcs*/
 void saattueLiikuta(){
-  debug("saattueLiikuta()");
+  #ifdef DEBUG
+    debug("saattueLiikuta()");
+  #endif
   digitalWrite(Saattue.DPIN_KETJU,HIGH);
 }
 
 void saattueSeis(){
+  #ifdef DEBUG
+    debug("saattueSeis()");
+  #endif
   digitalWrite(Saattue.DPIN_KETJU,LOW);
 }
 void saattueReset(){
@@ -143,8 +156,11 @@ void saattueReset(){
     debug("saattueReset()");
   #endif
   saattueLiikuta();
-  while(readIR(Talo.DPIN_STARTPOS) ==false ){
+  if(readIR(Talo.DPIN_STARTPOS) ==false){
     saattueSeis();
+    while(readIR(Talo.DPIN_STARTPOS) ==false ){
+      delay(1);
+    }
   }
 
   Saattue.resetDone =true;
@@ -165,6 +181,9 @@ void saattueReset(){
  * kierros päättyy
 */
 void hautajaiset (){
+  #ifdef DEBUG
+    debug("hautajaiset()");
+  #endif
   hissiYlos();
   delay(Hissi.NOSTON_KESTO); 
   saattueLiikuta();
@@ -210,18 +229,20 @@ bool readIR(int pin){
 }
 
 /** UTILS*/
-#ifdef DEBUG
+
 void debug(String msg){
+  #ifdef DEBUG
     Serial.println(msg);
+  #endif
 }
-#endif
+
 
 ////// Arduino 'main' /////////
 
 void setup() {
   // put your setup code here, to run once:
   #ifdef DEBUG
-    Serial.begin(9600);
+    Serial.begin(19200);
     debug("setup()");
   #endif
   
@@ -260,6 +281,9 @@ void loop() {
     Hautajaiset.onkoAloitettu = digitalRead(Hautajaiset.DPIN_ALOITA_BTN) == HIGH;
     delay(1);
   }
+  #ifdef DEBUG
+    debug("DPIN_ALOITA_BTN=" +(String)Hautajaiset.onkoAloitettu);
+  #endif
   //älä aloita hautajaisia ennen kuin Arkku on hississä (alussa hissi alhaalla)
   while(readIR(Hissi.DPIN_IR_ARKKU_HISSISSA) ==false){
     delay(1);
