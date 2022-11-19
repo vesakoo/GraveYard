@@ -1,5 +1,5 @@
 #include <Stepper.h>
-#define DEBUG true
+#define DEBUG 1
 /**
  * GraveYard ver 0.0.1
  * Author: Vesa Kankkunen
@@ -76,6 +76,9 @@ struct
 /** Alien funcs*/
 
 void alienAlas(){
+  #ifdef DEBUG
+    debug("alienAlas()");
+  #endif
   alienStepper.step(-1*Alien.STEPS_UPDOWN);//steppien pituus alienin laskuun
 }
 
@@ -84,7 +87,9 @@ void alienYlos(){
 }
 
 void alienReset(){
-  debug("alienReset()");
+  #ifdef DEBUG
+    debug("alienReset()");
+  #endif
   alienStepper.setSpeed(Alien.SPEED);
   while (Alien.buttonVal == 0)
   {
@@ -107,7 +112,9 @@ void alienReset(){
  * @TODO
  * */
 void hissiAlas(){
-  debug("hissiAlas()");
+  #ifdef DEBUG
+    debug("hissiAlas()");
+  #endif
   //must have status && press down btn
   Hissi.isDown =true;
 }
@@ -117,7 +124,9 @@ void hissiYlos(){
 
 }
 void hissiReset(){
-  debug("hissiReset()");
+  #ifdef DEBUG
+    debug("hissiReset()");
+  #endif
   Hissi.isDown =true;
 }
 /**Ketju funcs*/
@@ -130,6 +139,9 @@ void saattueSeis(){
   digitalWrite(Saattue.DPIN_KETJU,LOW);
 }
 void saattueReset(){
+  #ifdef DEBUG
+    debug("saattueReset()");
+  #endif
   saattueLiikuta();
   while(readIR(Talo.DPIN_STARTPOS) ==false ){
     saattueSeis();
@@ -198,18 +210,21 @@ bool readIR(int pin){
 }
 
 /** UTILS*/
+#ifdef DEBUG
 void debug(String msg){
-  if(DEBUG)
     Serial.println(msg);
 }
+#endif
 
 ////// Arduino 'main' /////////
 
 void setup() {
   // put your setup code here, to run once:
-  if(DEBUG){
+  #ifdef DEBUG
     Serial.begin(9600);
-  }
+    debug("setup()");
+  #endif
+  
 
   pinMode(Alien.DPIN_IN1_A,OUTPUT);
   pinMode(Alien.DPIN_IN2_B,OUTPUT);
@@ -235,7 +250,10 @@ void setup() {
 }
 
 void loop() {
-  debug("loop()");
+  #ifdef DEBUG
+    debug("loop()");
+  #endif
+  
   //Älä aloita hautajaisia ennen kuin nappia on painettu
   while (Hautajaiset.onkoAloitettu ==false)
   {
