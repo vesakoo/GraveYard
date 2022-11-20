@@ -15,8 +15,8 @@ struct
   const int APIN_ALHAALLA_BTN = 1;
   //Alienin moottori
   const int SPEED = 30;
-  const int STEPS_TOTAL = 100;
-  const int STEPS_UPDOWN = 80;
+  const int STEPS_TOTAL = 100; //steps per round tod näk
+  const int STEPS_UPDOWN = 80; // nosto- ja laskumatka kotipesältä
   const int STEPLEN_IN_RESET = 1;
   
   bool resetDone =false;
@@ -157,11 +157,12 @@ void saattueReset(){
   #endif
   saattueLiikuta();
   if(readIR(Talo.DPIN_STARTPOS) ==false){
-    saattueSeis();
     while(readIR(Talo.DPIN_STARTPOS) ==false ){
       delay(1);
     }
   }
+  saattueSeis();
+
 
   Saattue.resetDone =true;
 }
@@ -191,22 +192,40 @@ void hautajaiset (){
   hissiAlas();
   delay(Saattue.ODOTUSAIKA_HISSIN_LASKULLE);
   if(Hissi.isDown ==false){
+    #ifdef DEBUG
+    debug("saattueSeis koska Hissi.isdown =" + (String)Hissi.isDown);
+    #endif
     saattueSeis();
     do
     {
       delay(1);
     } while (Hissi.isDown);
+    #ifdef DEBUG
+      debug("Hissi on laskeutunut, pysäytetty saattue tulee jatkaa matkaa");
+    #endif
     saattueLiikuta();
   }
-  while (Hauta.arkkuHautaan = readIR(Hauta.DPIN_IR) )//!!!!!! tapahtuma!!!
+  #ifdef DEBUG
+    debug("odotellaan arkun putoamista hautaan...");
+  #endif 
+  while ((Hauta.arkkuHautaan = readIR(Hauta.DPIN_IR))==false )//!!!!!! tapahtuma!!!
   {
     delay(1);
   }
+  #ifdef DEBUG
+    debug("arkku putosi hautaan, käynnistetään viive Alienin nostamiseksi...");
+  #endif
   delay(Saattue.KESTO_HAUDALTA_ALIENILLE);
   alienYlos();
   saattueSeis();
+  #ifdef DEBUG
+    debug("käynnistetään viive alienin katsomiseksi");
+  #endif
   delay(Saattue.KESTO_KATSOO_ALIENIA);
   alienAlas();
+  #ifdef DEBUG
+    debug("ootellaan hetki ja jatketaan matkaa talolle.");
+  #endif
   delay(Saattue.KESTO_KATSOO_ALIENIA);
   //saattueSeis();
   //delay(Saattue.KESTO_ODOTTAA_PAIKALLAAN_ALIENIA);
@@ -215,10 +234,13 @@ void hautajaiset (){
   //alienAlas()
   // put your main code here, to run repeatedly:
   saattueLiikuta();
-  while (readIR(Talo.DPIN_IR))
+  while (readIR(Talo.DPIN_IR) == false)
   {
     delay(1);
   }
+  #ifdef DEBUG
+    debug("talon ir ilmoitti saattueen saapuneen taloon");
+  #endif
   saattueSeis();
 }
 
@@ -243,7 +265,7 @@ void setup() {
   // put your setup code here, to run once:
   #ifdef DEBUG
     Serial.begin(19200);
-    debug("setup()");
+    debug("\n======== setup() ohjelma käynnistyy");
   #endif
   
 
@@ -272,7 +294,7 @@ void setup() {
 
 void loop() {
   #ifdef DEBUG
-    debug("loop()");
+    debug("loop(), odota start-nappia");
   #endif
   
   //Älä aloita hautajaisia ennen kuin nappia on painettu
@@ -283,11 +305,15 @@ void loop() {
   }
   #ifdef DEBUG
     debug("DPIN_ALOITA_BTN=" +(String)Hautajaiset.onkoAloitettu);
+    debug("odota onko arkku hississä -IR" );
   #endif
   //älä aloita hautajaisia ennen kuin Arkku on hississä (alussa hissi alhaalla)
   while(readIR(Hissi.DPIN_IR_ARKKU_HISSISSA) ==false){
     delay(1);
   }
+  #ifdef DEBUG
+    debug("odota onko saattue aloistuspisteessä Talo.DPIN_STARTPOS" );
+  #endif
   //älä aloita hautajaisia jos saattue ei ole aloituskohdassa
   while (readIR(Talo.DPIN_STARTPOS) ==false)
   {
