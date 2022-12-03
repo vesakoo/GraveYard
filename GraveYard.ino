@@ -15,7 +15,7 @@ struct
   const int DPIN_IN1_A =9;
   const int DPIN_IN2_B = 10;
   const int DPIN_ENABLER = 8;
-  const int DPIN_ALHAALLA_BTN = 1;
+  const int DPIN_ALHAALLA_BTN = 15;
   //Alienin moottori
   const int SPEED = 30;
   const int STEPS_TOTAL = 100; //steps per round tod näk
