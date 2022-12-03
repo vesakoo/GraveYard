@@ -4,6 +4,9 @@
  * GraveYard ver 0.0.1
  * Author: Vesa Kankkunen
  * Ver: 0.0.1
+ * 
+ * https://miro.com/app/board/uXjVOCew02A=/
+ * 
 */
 const int ANALOG_GROUND_LIMIT =500;
 struct 
@@ -36,7 +39,7 @@ struct {
   const int DPIN_A = 6;
   const int DPIN_B = 5;
   const int APIN_ALHAALLA_BTN = 0;
-  const int NOSTON_KESTO = 5000;
+  const int NOSTON_KESTO = 90000;
   
   bool resetDone =false;
   bool isDown = false;
@@ -115,6 +118,23 @@ void alienReset(){
 }
 
 
+void hissiRampUp(int from, int to, unsigned int pin){
+  for (int i = from; i < to; i++)
+  {
+    analogWrite(pin,i);
+   delay(10);
+  }
+}
+
+void hissiRampDown(int from, int to, unsigned int pin){
+  for (int i = from; i > to; i--)
+  {
+    analogWrite(pin,i);
+    delay(10);
+  }
+  digitalWrite(pin,LOW);
+}
+
 /**
  * Hissi funcs
  * @TODO
@@ -123,9 +143,21 @@ void hissiAlas(){
   #ifdef DEBUG
     debug("hissiAlas()");
   #endif
+ //
+ for (int i = 50; i < 256; i++)
+  {
+    analogWrite(pin,i);
+   delay(10);
+  }
+  while(analogRead(Hissi.APIN_ALHAALLA_BTN) ==0){
+    delay(1);
+  } 
   //must have status && press down btn
   Hissi.isDown =true;
 }
+
+
+
 void hissiYlos(){
   debug("hissiYlos()");
   Hissi.isDown =false;  
@@ -247,17 +279,16 @@ void hautajaiset (){
 
 /**generig irda read*/
 bool readIR(int pin){
-  return digitalRead(pin)== HIGH;
+  return digitalRead(pin)== LOW;
 }
 
 /** UTILS*/
 
-void debug(String msg){
   #ifdef DEBUG
+void debug(String msg){
     Serial.println(msg);
-  #endif
 }
-
+  #endif
 
 ////// Arduino 'main' /////////
 
