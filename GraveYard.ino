@@ -364,10 +364,12 @@ void setup() {
   pinMode(Alien.DPIN_IN1_A,OUTPUT);
   pinMode(Alien.DPIN_IN2_B,OUTPUT);
   pinMode(Alien.DPIN_ENABLER,OUTPUT);
+  pinMode(Alien.DPIN_ALHAALLA_BTN,INPUT);
 
   pinMode(Hissi.DPIN_A,OUTPUT);
   pinMode(Hissi.DPIN_B,OUTPUT);
   pinMode(Hissi.DPIN_IR_ARKKU_HISSISSA,INPUT);
+  pinMode(Hissi.DPIN_ALHAALLA_BTN,INPUT);
 
   pinMode(Hauta.DPIN_IR,INPUT);
   
