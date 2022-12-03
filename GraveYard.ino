@@ -49,8 +49,13 @@ struct {
 struct  {
   /* data */
   const int DPIN_KETJU = 7;
-  const int KESTO_ARKKUN_OTTO_HISSISTA = 2000;
-  const int ODOTUSAIKA_HISSIN_LASKULLE = 2000;
+  //hissi lasku alas alkaa kun saattue on kulkenut arkun kanssa tämän ajan
+  // (päässyt pois hissin päältä)
+  const int KESTO_ARKKUN_OTTO_HISSISTA = 2000; 
+  //saattue liikkuu tämän ajan kulkien arkun kanssa talolta haudalle.
+  //jos hissi ei ole laskeutunut alas,
+  //saattue pysähtyy odottamaan kunnes hissi on alhaalla (hissin alakytkin laukeaa) 
+  const int ODOTUSAIKA_HISSIN_LASKULLE = 2000; 
   const int KESTO_HAUDALTA_ALIENILLE = 5000;
   const int KESTO_ODOTTAA_PAIKALLAAN_ALIENIA = 2000;
   const int KESTO_KATSOO_ALIENIA = 3000;
@@ -147,6 +152,38 @@ void motorRampDown(int from, int to, unsigned int pin){
 /**
  * Hissi funcs
  * */
+void hissiAlasWithSaattueStop(){
+  #ifdef DEBUG
+    debug("hissiAlasWithSaattueMonitor()");
+  #endif
+  long saattueTimerStart =micros();
+  bool saattueWaitsForHissi = false;
+  if(digitalRead(Hissi.DPIN_ALHAALLA_BTN)==false){
+    motorRampUp(50,255,Hissi.DPIN_A);
+  }
+  while(digitalRead(Hissi.DPIN_ALHAALLA_BTN) ==false){
+    long newTime = micros();
+    if(newTime > saattueTimerStart + Saattue.ODOTUSAIKA_HISSIN_LASKULLE*1000 ){
+      saattueSeis();
+      saattueWaitsForHissi = true;
+      #ifdef DEBUG
+        debug("Saattue pysäytettiinn ennen hautaa koska hissi ei ole ehtinyt alas");
+      #endif
+    }
+    delay(1);
+  }
+  hissiJarruta();
+  //must have status && press down btn
+  Hissi.isDown =true;
+  if(saattueWaitsForHissi){
+    #ifdef DEBUG
+      debug("Hissi on laskeutunut, pysäytetyn saattueen tulee jatkaa matkaa");
+    #endif
+    saattueLiikuta();
+  }
+
+}
+
 void hissiAlas(){
   #ifdef DEBUG
     debug("hissiAlas()");
@@ -240,7 +277,8 @@ void hautajaiset (){
   delay(Hissi.NOSTON_KESTO); 
   saattueLiikuta();
   delay(Saattue.KESTO_ARKKUN_OTTO_HISSISTA);
-  hissiAlas();
+  hissiAlasWithSaattueStop();
+  /*hissiAlas();
   delay(Saattue.ODOTUSAIKA_HISSIN_LASKULLE);
   if(Hissi.isDown ==false){
     #ifdef DEBUG
@@ -255,12 +293,14 @@ void hautajaiset (){
       debug("Hissi on laskeutunut, pysäytetty saattue tulee jatkaa matkaa");
     #endif
     saattueLiikuta();
-  }
+  }*/
+
   #ifdef DEBUG
     debug("odotellaan arkun putoamista hautaan...");
   #endif 
-  while ((Hauta.arkkuHautaan = readIR(Hauta.DPIN_IR))==false )//!!!!!! tapahtuma!!!
+  while (Hauta.arkkuHautaan ==false )//!!!!!! tapahtuma!!!
   {
+    Hauta.arkkuHautaan = readIR(Hauta.DPIN_IR);
     delay(1);
   }
   #ifdef DEBUG
