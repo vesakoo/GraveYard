@@ -3,7 +3,7 @@
 /**
  * GraveYard ver 0.0.1
  * Author: Vesa Kankkunen
- * Ver: 0.0.1
+ * Ver: 1.0.0
  * 
  * https://miro.com/app/board/uXjVOCew02A=/
  * 
