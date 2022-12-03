@@ -300,7 +300,10 @@ void hautajaiset (){
   #endif 
   while (Hauta.arkkuHautaan ==false )//!!!!!! tapahtuma!!!
   {
-    Hauta.arkkuHautaan = readIR(Hauta.DPIN_IR);
+     //hauta ir voi jäädä huomaamatta!!!!!
+    //varmistetaan lukemalla onko arkku jo hississä
+    Hauta.arkkuHautaan = readIR(Hauta.DPIN_IR) || readIR(Hissi.DPIN_IR_ARKKU_HISSISSA);
+
     delay(1);
   }
   #ifdef DEBUG
