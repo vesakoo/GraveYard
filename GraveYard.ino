@@ -15,7 +15,7 @@ struct
   const int DPIN_IN1_A =9;
   const int DPIN_IN2_B = 10;
   const int DPIN_ENABLER = 8;
-  const int APIN_ALHAALLA_BTN = 1;
+  const int DPIN_ALHAALLA_BTN = 1;
   //Alienin moottori
   const int SPEED = 30;
   const int STEPS_TOTAL = 100; //steps per round tod näk
@@ -38,7 +38,7 @@ struct {
   const int DPIN_IR_ARKKU_HISSISSA = 12;
   const int DPIN_A = 6;
   const int DPIN_B = 5;
-  const int APIN_ALHAALLA_BTN = 0;
+  const int DPIN_ALHAALLA_BTN = 14; //same as analog 0
   const int NOSTON_KESTO = 90000;
   
   bool resetDone =false;
@@ -99,26 +99,26 @@ void alienReset(){
     debug("alienReset()");
     debug("DPIN_IN1_A: "+(String)Alien.DPIN_IN1_A);
     debug("DPIN_IN1_B: "+(String)Alien.DPIN_IN2_B);
-    debug("Alien.APIN_ALHAALLA_BTN: "+ (String)Alien.APIN_ALHAALLA_BTN);
+    debug("Alien.APIN_ALHAALLA_BTN: "+ (String)Alien.DPIN_ALHAALLA_BTN);
   #endif
   alienStepper.setSpeed(Alien.SPEED);
   while (Alien.buttonVal  < ANALOG_GROUND_LIMIT)
   {
     alienStepper.step(-1 * Alien.STEPLEN_IN_RESET);
-    Alien.buttonVal = analogRead(Alien.APIN_ALHAALLA_BTN);
+    Alien.buttonVal = analogRead(Alien.DPIN_ALHAALLA_BTN);
     delay(1);
   }
   while (Alien.buttonVal > ANALOG_GROUND_LIMIT)
   {
     alienStepper.step(Alien.STEPLEN_IN_RESET);
-    Alien.buttonVal = analogRead(Alien.APIN_ALHAALLA_BTN);
+    Alien.buttonVal = analogRead(Alien.DPIN_ALHAALLA_BTN);
     delay(1);
   }
   Alien.resetDone =true;
 }
 
 
-void hissiRampUp(int from, int to, unsigned int pin){
+void motorRampUp(int from, int to, unsigned int pin){
   for (int i = from; i < to; i++)
   {
     analogWrite(pin,i);
@@ -126,63 +126,74 @@ void hissiRampUp(int from, int to, unsigned int pin){
   }
 }
 
-void hissiRampDown(int from, int to, unsigned int pin){
+void motorRampDown(int from, int to, unsigned int pin){
   for (int i = from; i > to; i--)
   {
     analogWrite(pin,i);
     delay(10);
   }
-  digitalWrite(pin,LOW);
+  if(to == 0)
+    digitalWrite(pin,LOW);
 }
 
 /**
  * Hissi funcs
- * @TODO
  * */
 void hissiAlas(){
   #ifdef DEBUG
     debug("hissiAlas()");
   #endif
- //
- for (int i = 50; i < 256; i++)
-  {
-    analogWrite(pin,i);
-   delay(10);
+  if(digitalRead(Hissi.DPIN_ALHAALLA_BTN)==false){
+    motorRampUp(50,255,Hissi.DPIN_A);
   }
-  while(analogRead(Hissi.APIN_ALHAALLA_BTN) ==0){
+  while(digitalRead(Hissi.DPIN_ALHAALLA_BTN) ==false){
     delay(1);
-  } 
+  }
+  hissiJarruta();
   //must have status && press down btn
   Hissi.isDown =true;
 }
 
-
-
 void hissiYlos(){
   debug("hissiYlos()");
-  Hissi.isDown =false;  
-
+  Hissi.isDown =false;
+  motorRampUp(50,255,Hissi.DPIN_B);
+  delay(Hissi.NOSTON_KESTO);
+  motorRampDown(250,0,Hissi.DPIN_B);
+  //hissiJarruta();
 }
+
+void hissiJarruta(){
+  digitalWrite(Hissi.DPIN_A,LOW);
+  digitalWrite(Hissi.DPIN_B,LOW);
+}
+
 void hissiReset(){
   #ifdef DEBUG
     debug("hissiReset()");
   #endif
+  hissiAlas();
   Hissi.isDown =true;
 }
+
 /**Ketju funcs*/
 void saattueLiikuta(){
   #ifdef DEBUG
     debug("saattueLiikuta()");
   #endif
-  digitalWrite(Saattue.DPIN_KETJU,HIGH);
+  digitalWrite(Saattue.DPIN_KETJU,LOW); //NOTE! relay pin LOW == move
 }
 
 void saattueSeis(){
   #ifdef DEBUG
     debug("saattueSeis()");
   #endif
-  digitalWrite(Saattue.DPIN_KETJU,LOW);
+  digitalWrite(Saattue.DPIN_KETJU,HIGH); //NOTE! relay pin HIGH == stop
 }
+
+/**
+ * Move saattue from starting pos and stop there!! 
+ */
 void saattueReset(){
   #ifdef DEBUG
     debug("saattueReset()");
