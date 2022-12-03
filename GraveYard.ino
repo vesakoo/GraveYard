@@ -18,8 +18,8 @@ struct
   const int DPIN_ALHAALLA_BTN = 15;
   //Alienin moottori
   const int SPEED = 30;
-  const int STEPS_TOTAL = 100; //steps per round tod näk
-  const int STEPS_UPDOWN = 80; // nosto- ja laskumatka kotipesältä
+  const int STEPS_TOTAL = 1000; //steps per round tod näk
+  const int STEPS_UPDOWN = 90; // nosto- ja laskumatka kotipesältä
   const int STEPLEN_IN_RESET = 1;
   
   bool resetDone =false;
@@ -84,14 +84,20 @@ void alienAlas(){
   #ifdef DEBUG
     debug("alienAlas()");
   #endif
+  digitalWrite(Alien.DPIN_ENABLER,HIGH);
+  alienStepper.setSpeed(Alien.SPEED);
   alienStepper.step(-1 * Alien.STEPS_UPDOWN);//steppien pituus alienin laskuun
+  digitalWrite(Alien.DPIN_ENABLER,LOW);
 }
 
 void alienYlos(){
   #ifdef DEBUG
     debug("alienYlos()");
   #endif 
+  alienStepper.setSpeed(Alien.SPEED);
+  digitalWrite(Alien.DPIN_ENABLER,HIGH);
   alienStepper.step(Alien.STEPS_UPDOWN); //steppien pituus alienin nostoon (=-laskupituus)
+  digitalWrite(Alien.DPIN_ENABLER,LOW);
 }
 
 void alienReset(){
@@ -101,20 +107,22 @@ void alienReset(){
     debug("DPIN_IN1_B: "+(String)Alien.DPIN_IN2_B);
     debug("Alien.APIN_ALHAALLA_BTN: "+ (String)Alien.DPIN_ALHAALLA_BTN);
   #endif
-  alienStepper.setSpeed(Alien.SPEED);
-  while (Alien.buttonVal  < ANALOG_GROUND_LIMIT)
+  digitalWrite(Alien.DPIN_ENABLER,HIGH);
+  alienStepper.setSpeed(Alien.SPEED*.2);
+  while (Alien.buttonVal  ==false )
   {
     alienStepper.step(-1 * Alien.STEPLEN_IN_RESET);
-    Alien.buttonVal = analogRead(Alien.DPIN_ALHAALLA_BTN);
+    Alien.buttonVal = digitalRead(Alien.DPIN_ALHAALLA_BTN);
     delay(1);
   }
-  while (Alien.buttonVal > ANALOG_GROUND_LIMIT)
+  while (Alien.buttonVal == true )
   {
     alienStepper.step(Alien.STEPLEN_IN_RESET);
-    Alien.buttonVal = analogRead(Alien.DPIN_ALHAALLA_BTN);
+    Alien.buttonVal = digitalRead(Alien.DPIN_ALHAALLA_BTN);
     delay(1);
   }
   Alien.resetDone =true;
+  digitalWrite(Alien.DPIN_ENABLER,LOW);
 }
 
 
