@@ -12,8 +12,8 @@ const int ANALOG_GROUND_LIMIT =500;
 struct 
 {
   /* data */
-  const int DPIN_IN1_A =9;
-  const int DPIN_IN2_B = 10;
+  const int DPIN_IN1_A =10;
+  const int DPIN_IN2_B = 9;
   const int DPIN_ENABLER = 8;
   const int DPIN_ALHAALLA_BTN = 15;
   //Alienin moottori
