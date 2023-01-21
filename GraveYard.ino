@@ -3,9 +3,10 @@
 /**
  * GraveYard ver 0.0.1
  * Author: Vesa Kankkunen
- * Ver: 1.0.0
+ * Ver: 1.0.1
  * 
  * https://miro.com/app/board/uXjVOCew02A=/
+ * 
  * 
 */
 const int ANALOG_GROUND_LIMIT =500;
@@ -19,7 +20,7 @@ struct
   //Alienin moottori
   const int SPEED = 30;
   const int STEPS_TOTAL = 1000; //steps per round tod näk
-  const int STEPS_UPDOWN = 90; // nosto- ja laskumatka kotipesältä
+  const int STEPS_UPDOWN = 900; // nosto- ja laskumatka kotipesältä
   const int STEPLEN_IN_RESET = 1;
   
   bool resetDone =false;
@@ -51,7 +52,7 @@ struct  {
   const int DPIN_KETJU = 7;
   //hissi lasku alas alkaa kun saattue on kulkenut arkun kanssa tämän ajan
   // (päässyt pois hissin päältä)
-  const int KESTO_ARKKUN_OTTO_HISSISTA = 2000; 
+  const int KESTO_ARKKUN_OTTO_HISSISTA = 15000; 
   //saattue liikkuu tämän ajan kulkien arkun kanssa talolta haudalle.
   //jos hissi ei ole laskeutunut alas,
   //saattue pysähtyy odottamaan kunnes hissi on alhaalla (hissin alakytkin laukeaa) 
@@ -70,7 +71,7 @@ struct {
 struct 
 {
   /* data */
-  const int DPIN_IR = 13;
+  const int DPIN_IR = 3;//13;
   const int DPIN_STARTPOS = 3;
 } Talo;
 
@@ -226,14 +227,14 @@ void saattueLiikuta(){
   #ifdef DEBUG
     debug("saattueLiikuta()");
   #endif
-  digitalWrite(Saattue.DPIN_KETJU,LOW); //NOTE! relay pin LOW == move
+  digitalWrite(Saattue.DPIN_KETJU,HIGH); //NOTE! relay pin LOW == move
 }
 
 void saattueSeis(){
   #ifdef DEBUG
     debug("saattueSeis()");
   #endif
-  digitalWrite(Saattue.DPIN_KETJU,HIGH); //NOTE! relay pin HIGH == stop
+  digitalWrite(Saattue.DPIN_KETJU,LOW); //NOTE! relay pin HIGH == stop
 }
 
 /**
@@ -274,7 +275,7 @@ void hautajaiset (){
     debug("hautajaiset()");
   #endif
   hissiYlos();
-  delay(Hissi.NOSTON_KESTO); 
+  //delay(Hissi.NOSTON_KESTO); 
   saattueLiikuta();
   delay(Saattue.KESTO_ARKKUN_OTTO_HISSISTA);
   hissiAlasWithSaattueStop();
@@ -392,8 +393,9 @@ void loop() {
   #endif
   
   //Älä aloita hautajaisia ennen kuin nappia on painettu
+  debug("Hautajaiset.onkoAloitettu ==false");
   while (Hautajaiset.onkoAloitettu ==false)
-  {
+  { 
     Hautajaiset.onkoAloitettu = digitalRead(Hautajaiset.DPIN_ALOITA_BTN) == HIGH;
     delay(1);
   }
@@ -402,6 +404,7 @@ void loop() {
     debug("odota onko arkku hississä -IR" );
   #endif
   //älä aloita hautajaisia ennen kuin Arkku on hississä (alussa hissi alhaalla)
+  debug("Hissi.DPIN_IR_ARKKU_HISSISSA) ==false");
   while(readIR(Hissi.DPIN_IR_ARKKU_HISSISSA) ==false){
     delay(1);
   }
