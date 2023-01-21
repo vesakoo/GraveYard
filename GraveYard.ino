@@ -56,7 +56,7 @@ struct  {
   //saattue liikkuu tämän ajan kulkien arkun kanssa talolta haudalle.
   //jos hissi ei ole laskeutunut alas,
   //saattue pysähtyy odottamaan kunnes hissi on alhaalla (hissin alakytkin laukeaa) 
-  const int ODOTUSAIKA_HISSIN_LASKULLE = 15000; 
+  const int ODOTUSAIKA_HISSIN_LASKULLE = 13000; 
   const int KESTO_HAUDALTA_ALIENILLE = 5000;
   const int KESTO_ODOTTAA_PAIKALLAAN_ALIENIA = 2000;
   const int KESTO_KATSOO_ALIENIA = 3000;
