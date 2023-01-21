@@ -164,7 +164,7 @@ void hissiAlasWithSaattueStop(){
   }
   while(digitalRead(Hissi.DPIN_ALHAALLA_BTN) ==false){
     long newTime = micros();
-    if(newTime > saattueTimerStart + Saattue.ODOTUSAIKA_HISSIN_LASKULLE*1000 ){
+    if(newTime > saattueTimerStart + Saattue.ODOTUSAIKA_HISSIN_LASKULLE*1000 && saattueWaitsForHissi == false){
       saattueSeis();
       saattueWaitsForHissi = true;
       #ifdef DEBUG
