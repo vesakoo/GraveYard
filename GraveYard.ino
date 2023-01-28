@@ -40,7 +40,7 @@ struct {
   const int DPIN_A = 6;
   const int DPIN_B = 5;
   const int DPIN_ALHAALLA_BTN = 14; //same as analog 0
-  const unsigned long NOSTON_KESTO = 118000;
+  const unsigned long NOSTON_KESTO = 118000ul;
   
   bool resetDone =false;
   bool isDown = false;
