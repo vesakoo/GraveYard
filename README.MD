@@ -5,8 +5,8 @@ which is integared detail in a railroad scale model.
 
 ## requirements
 
-Arduino R3
-###For alien
+Arduino R3   
+### For alien
 50mm Stroke Linear actuator Micro 10mm Stepper motor 5V  with driver   
 
 ### For Magnetic chain 
