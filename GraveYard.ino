@@ -40,6 +40,7 @@ struct {
   const int DPIN_A = 6;
   const int DPIN_B = 5;
   const int DPIN_ALHAALLA_BTN = 14; //same as analog 0
+  const unsigned long HOME_OFFSET = 0ul;
   const unsigned long NOSTON_KESTO = 118000ul;
   
   bool resetDone =false;
@@ -174,6 +175,9 @@ void hissiAlasWithSaattueStop(){
     delay(1);
   }
   hissiJarruta();
+  if(Hissi.HOME_OFFSET >0){
+    hissiHomeOffset();
+  }
   //must have status && press down btn
   Hissi.isDown =true;
   if(saattueWaitsForHissi){
@@ -197,6 +201,9 @@ void hissiAlas(){
   }
   hissiJarruta();
   //must have status && press down btn
+  if(Hissi.HOME_OFFSET >0){
+    hissiHomeOffset();
+  }
   Hissi.isDown =true;
 }
 
@@ -219,7 +226,16 @@ void hissiReset(){
     debug("hissiReset()");
   #endif
   hissiAlas();
+  if(Hissi.HOME_OFFSET >0){
+    hissiHomeOffset();
+  }
   Hissi.isDown =true;
+}
+
+void hissiHomeOffset(){
+  digitalWrite(Hissi.DPIN_B,HIGH);
+  delay(Hissi.HOME_OFFSET);
+  hissiJarruta();
 }
 
 /**Ketju funcs*/
