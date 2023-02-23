@@ -319,7 +319,7 @@ void hautajaiset (){
   {
     //hauta ir voi jäädä huomaamatta!!!!!
     //varmistetaan lukemalla onko arkku jo hississä
-    Hauta.arkkuHautaan = readIR(Hauta.DPIN_IR) || readIR(Hissi.DPIN_IR_ARKKU_HISSISSA);
+    Hauta.arkkuHautaan = readIR(Hauta.DPIN_IR); /*|| readIR(Hissi.DPIN_IR_ARKKU_HISSISSA);*/
     delay(1);
   }
   #ifdef DEBUG
