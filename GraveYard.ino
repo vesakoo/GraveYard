@@ -435,6 +435,8 @@ void loop() {
   hautajaiset();
   //hautajaiset ovat päättyneet (taloon)
   Hautajaiset.onkoAloitettu =false;
+  Hauta.arkkuHautaan=false;
+
 
   
   //wait untill start btn
