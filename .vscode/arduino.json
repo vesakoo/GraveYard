@@ -1,4 +1,5 @@
 {
     "board": "arduino:avr:uno",
-    "sketch": "GraveYard.ino"
+    "sketch": "GraveYard.ino",
+    "port": "/dev/tty.usbmodem14301"
 }
